@@ -25,7 +25,7 @@ type PermissionCheckHandler = (
 ) => boolean;
 
 function createWindowDouble() {
-  let navigationHandler: NavigationHandler | undefined;
+  const navigationHandlers = new Map<string, NavigationHandler>();
   let windowOpenHandler: WindowOpenHandler | undefined;
   let permissionRequestHandler: PermissionRequestHandler | undefined;
   let permissionCheckHandler: PermissionCheckHandler | undefined;
@@ -35,7 +35,7 @@ function createWindowDouble() {
     loadURL: vi.fn(),
     webContents: {
       on: vi.fn((event: string, handler: NavigationHandler) => {
-        if (event === 'will-navigate') navigationHandler = handler;
+        navigationHandlers.set(event, handler);
       }),
       setWindowOpenHandler: vi.fn((handler: WindowOpenHandler) => {
         windowOpenHandler = handler;
@@ -55,7 +55,7 @@ function createWindowDouble() {
   return {
     window,
     handlers: {
-      navigation: () => navigationHandler,
+      navigation: (event: string) => navigationHandlers.get(event),
       windowOpen: () => windowOpenHandler,
       permissionRequest: () => permissionRequestHandler,
       permissionCheck: () => permissionCheckHandler,
@@ -94,8 +94,12 @@ describe('WhatsApp window configuration', () => {
     expect(window.loadURL).toHaveBeenCalledWith('https://web.whatsapp.com');
 
     const event = { preventDefault: vi.fn() };
-    handlers.navigation()?.(event, 'notaurl');
+    handlers.navigation('will-navigate')?.(event, 'notaurl');
     expect(event.preventDefault).toHaveBeenCalledOnce();
+
+    const redirectEvent = { preventDefault: vi.fn() };
+    handlers.navigation('will-redirect')?.(redirectEvent, 'https://evil.test/redirect');
+    expect(redirectEvent.preventDefault).toHaveBeenCalledOnce();
 
     expect(handlers.windowOpen()?.({ url: 'notaurl' })).toEqual({ action: 'deny' });
     expect(openExternal).not.toHaveBeenCalled();
@@ -109,6 +113,13 @@ describe('WhatsApp window configuration', () => {
       requestPermission,
     );
     expect(requestPermission).toHaveBeenCalledWith(true);
+    const requestPermissionForTrailingSlashUrl = vi.fn();
+    handlers.permissionRequest()?.(
+      { getURL: () => 'https://web.whatsapp.com/' },
+      'media',
+      requestPermissionForTrailingSlashUrl,
+    );
+    expect(requestPermissionForTrailingSlashUrl).toHaveBeenCalledWith(true);
     expect(handlers.permissionCheck()?.(null, 'geolocation', 'https://web.whatsapp.com')).toBe(false);
     expect(setDisplayMediaRequestHandler).not.toHaveBeenCalled();
   });

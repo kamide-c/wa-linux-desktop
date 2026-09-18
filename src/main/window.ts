@@ -17,11 +17,11 @@ function safelyApplyUrlPolicy(policy: (url: string) => boolean, rawUrl: unknown)
   }
 }
 
-function safelyAllowPermission(origin: unknown, permission: unknown): boolean {
-  if (typeof origin !== 'string' || typeof permission !== 'string') return false;
+function safelyAllowPermission(requestingUrl: unknown, permission: unknown): boolean {
+  if (typeof requestingUrl !== 'string' || typeof permission !== 'string') return false;
 
   try {
-    return isAllowedWhatsAppPermission(origin, permission);
+    return isAllowedWhatsAppPermission(new URL(requestingUrl).origin, permission);
   } catch {
     return false;
   }
@@ -31,6 +31,10 @@ export function configureWhatsAppWindow(window: BrowserWindow): void {
   window.loadURL(WHATSAPP_WEB_ORIGIN);
 
   window.webContents.on('will-navigate', (event, url) => {
+    if (!safelyApplyUrlPolicy(isAllowedWhatsAppNavigation, url)) event.preventDefault();
+  });
+
+  window.webContents.on('will-redirect', (event, url) => {
     if (!safelyApplyUrlPolicy(isAllowedWhatsAppNavigation, url)) event.preventDefault();
   });
 

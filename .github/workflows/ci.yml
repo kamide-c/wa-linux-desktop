@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install RPM tooling
+        run: sudo apt-get update && sudo apt-get install --yes rpm
+      - name: Install dependencies
+        env:
+          NPM_CONFIG_LEGACY_PEER_DEPS: 'true'
+        run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run make

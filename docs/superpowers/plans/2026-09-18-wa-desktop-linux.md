@@ -6,7 +6,7 @@
 
 **Architecture:** Electron's main process owns one persistent Chromium profile, the native window/tray lifecycle, navigation policy, and permission allowlists. WhatsApp Web is loaded directly as an isolated remote page with no preload bridge or Node.js access. Pure TypeScript policy modules hold decisions that can be unit tested without Electron.
 
-**Tech Stack:** Electron 44.4.3, Electron Forge 7.11.2 with the stable Webpack TypeScript template, TypeScript 7.0.2, Vitest 5.0.1, Electron Forge RPM maker, GitHub Actions.
+**Tech Stack:** Electron 44.4.3, Electron Forge 7.11.2 with the stable Webpack TypeScript template, TypeScript 5.9.3, Vitest 5.0.1, Electron Forge RPM maker, GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-09-18-whatsapp-linux-design.md`
 
@@ -111,7 +111,7 @@ Create `package.json` with exact scripts:
 }
 ```
 
-Install Electron `44.4.3`, Electron Forge `7.11.2`, the Forge Webpack plugin, the RPM maker, TypeScript `7.0.2`, Vitest `5.0.1`, ESLint, and the TypeScript ESLint packages as development dependencies. Configure `forge.config.ts` with `asar: true`, and the `FuseV1Options` plugin disabling `RunAsNode`, `EnableNodeOptionsEnvironmentVariable`, and `EnableNodeCliInspectArguments`. Set `productName` to `WA Desktop Linux`, package name to `wa-desktop-linux`, and homepage to the repository URL. The RPM maker itself is added and verified in Task 7.
+Install Electron `44.4.3`, Electron Forge `7.11.2`, the Forge Webpack plugin, the RPM maker, TypeScript `5.9.3`, Vitest `5.0.1`, ESLint, and the TypeScript ESLint packages as development dependencies. Configure `forge.config.ts` with `asar: true`, and the `FuseV1Options` plugin disabling `RunAsNode`, `EnableNodeOptionsEnvironmentVariable`, and `EnableNodeCliInspectArguments`. Set `productName` to `WA Desktop Linux`, package name to `wa-desktop-linux`, and homepage to the repository URL. The RPM maker itself is added and verified in Task 7.
 
 Create `.gitignore` entries for `node_modules/`, `out/`, `.webpack/`, `.vite/`, `coverage/`, `.eslintcache`, `*.log`, and `whatsapp-web-profile/`. Configure Vitest with Node environment and `tests/**/*.test.ts`. Configure the workflow to run `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run make` on Ubuntu after installing `rpm`.
 

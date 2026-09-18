@@ -11,6 +11,7 @@
   },
   "include": [
     "forge.config.ts",
+    "vitest.config.ts",
     "webpack.*.config.ts",
     "tests/**/*.test.ts",
     "src/**/*.ts"

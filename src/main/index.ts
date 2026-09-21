@@ -3,7 +3,7 @@ import { resolveCloseAction, shouldStartHidden } from './lifecycle';
 import { buildTrayMenu } from './tray';
 import { createWindowOptions } from './window-config';
 import { configureWhatsAppWindow } from './window';
-import trayIconSvg from '../assets/tray-icon.svg';
+import whatsappIconPng from '../assets/whatsapp-icon.png';
 
 let mainWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -36,9 +36,7 @@ function setOpenAtLogin(enabled: boolean): void {
 
 function createMainWindow(): void {
   mainWindow = new BrowserWindow(createWindowOptions());
-  mainWindow.setIcon(
-    nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(trayIconSvg).toString('base64')}`),
-  );
+  mainWindow.setIcon(nativeImage.createFromDataURL(whatsappIconPng));
   configureWhatsAppWindow(mainWindow);
 
   mainWindow.on('close', (event) => {
@@ -54,7 +52,7 @@ function createMainWindow(): void {
 }
 
 function createTray(): void {
-  tray = new Tray(nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(trayIconSvg).toString('base64')}`));
+  tray = new Tray(nativeImage.createFromDataURL(whatsappIconPng));
   tray.setContextMenu(
     buildTrayMenu(
       showWindow,

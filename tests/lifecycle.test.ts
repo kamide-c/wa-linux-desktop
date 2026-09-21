@@ -77,7 +77,9 @@ describe('tray icon', () => {
     await import('../src/main/index.js');
     await Promise.resolve();
 
-    expect(createFromDataURL).toHaveBeenCalledWith(expect.stringMatching(/^data:image\/svg\+xml;base64,/));
+    expect(createFromDataURL).toHaveBeenCalledWith(
+      expect.stringMatching(/^(data:image\/png;base64,|\/src\/assets\/whatsapp-icon\.png$)/),
+    );
     expect(trayInstances).toHaveLength(1);
   });
 });

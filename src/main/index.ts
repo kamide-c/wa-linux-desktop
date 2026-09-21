@@ -36,6 +36,9 @@ function setOpenAtLogin(enabled: boolean): void {
 
 function createMainWindow(): void {
   mainWindow = new BrowserWindow(createWindowOptions());
+  mainWindow.setIcon(
+    nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(trayIconSvg).toString('base64')}`),
+  );
   configureWhatsAppWindow(mainWindow);
 
   mainWindow.on('close', (event) => {

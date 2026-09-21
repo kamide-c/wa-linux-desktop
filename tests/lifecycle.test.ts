@@ -24,6 +24,7 @@ vi.mock('electron', () => ({
     restore = vi.fn();
     show = vi.fn();
     loadURL = vi.fn();
+    setIcon = vi.fn();
     webContents = { on: vi.fn(), setWindowOpenHandler: vi.fn(), setUserAgent: vi.fn(), session: { setPermissionRequestHandler: vi.fn(), setPermissionCheckHandler: vi.fn() } };
   },
   Menu: { buildFromTemplate: vi.fn() },

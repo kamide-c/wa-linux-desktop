@@ -2,7 +2,7 @@
 
 A personal desktop shell for the official WhatsApp Web experience on Fedora Linux, GNOME, and Wayland.
 
-> **Project status:** planning. The application has not been implemented or released yet.
+> **Project status:** early development. Fedora RPM builds are available from the local build output; the first release is not yet published.
 
 ## Goals
 
@@ -30,11 +30,30 @@ Other distributions, X11, Flatpak packaging, and non-Linux platforms are out of 
 
 ## Development
 
-The application is not ready to run yet. Development setup, test commands, and RPM packaging instructions will be added with the first implementation.
+Requirements: Fedora 44 or newer, GNOME on Wayland, x86_64, Node.js 24, and npm.
+
+```bash
+npm ci
+npm start
+```
+
+Run the checks and create a Fedora RPM:
+
+```bash
+npm test
+npm run typecheck
+npm run lint
+npm run make
+sudo dnf install ./out/make/*/wa-desktop-linux-*.rpm
+```
+
+The application is designed to remain active in the system tray when its window is closed. Use the tray menu to show the window, enable autostart, or quit completely. The first launch opens WhatsApp Web and requires the normal QR-code linking flow.
+
+The RPM is deliberately built locally or by the repository's CI; no third-party WhatsApp binary is downloaded. The app itself loads only `https://web.whatsapp.com` and stores its Chromium session in Electron's local persistent profile.
 
 ## Security
 
-Please report security concerns privately to the repository owner rather than opening a public issue that discloses an exploit.
+Please report security concerns privately to the repository owner rather than opening a public issue that discloses an exploit. Do not paste WhatsApp session data, QR codes, logs containing message content, or profile directories into an issue.
 
 This project is independent and is not affiliated with, endorsed by, or supported by WhatsApp or Meta. WhatsApp is a trademark of its respective owner.
 

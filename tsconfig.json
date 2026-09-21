@@ -13,6 +13,7 @@
     "forge.config.ts",
     "vitest.config.ts",
     "webpack.*.config.ts",
+    "forge/**/*.d.ts",
     "tests/**/*.test.ts",
     "src/**/*.ts"
   ]

@@ -4,6 +4,8 @@
   "private": false,
   "main": ".webpack/main",
   "productName": "WA Desktop Linux",
+  "description": "A local Electron desktop shell for WhatsApp Web on Fedora Linux.",
+  "license": "MIT",
   "homepage": "https://github.com/kamide-c/wa-desktop-linux",
   "scripts": {
     "start": "electron-forge start",

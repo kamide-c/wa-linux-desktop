@@ -1,18 +1,21 @@
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
+import { FedoraRpmMaker } from './forge/fedora-rpm-maker.cjs';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 /** @type {import('@electron-forge/shared-types').ForgeConfig} */
 const config = {
   packagerConfig: {
     asar: true,
+    executableName: 'wa-desktop-linux',
   },
+  makers: [new FedoraRpmMaker({})],
   plugins: [
     new WebpackPlugin({
       mainConfig: './webpack.main.config.ts',
       renderer: {
         config: './webpack.renderer.config.ts',
-        entryPoints: [],
+        entryPoints: [{ name: 'remote-window', js: './src/renderer/placeholder.ts' }],
       },
     }),
     new FusesPlugin({

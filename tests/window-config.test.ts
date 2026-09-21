@@ -41,6 +41,7 @@ function createWindowDouble() {
       setWindowOpenHandler: vi.fn((handler: WindowOpenHandler) => {
         windowOpenHandler = handler;
       }),
+      setUserAgent,
       session: {
         setPermissionRequestHandler: vi.fn((handler: PermissionRequestHandler) => {
           permissionRequestHandler = handler;
@@ -48,7 +49,6 @@ function createWindowDouble() {
         setPermissionCheckHandler: vi.fn((handler: PermissionCheckHandler) => {
           permissionCheckHandler = handler;
         }),
-        setUserAgent,
         setDisplayMediaRequestHandler,
       },
     },

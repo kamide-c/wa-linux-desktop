@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
 import { FedoraRpmMaker } from './forge/fedora-rpm-maker.cjs';
@@ -8,8 +9,15 @@ const config = {
   packagerConfig: {
     asar: true,
     executableName: 'wa-desktop-linux',
+    icon: path.resolve(__dirname, 'src/assets/whatsapp-icon.png'),
   },
-  makers: [new FedoraRpmMaker({})],
+  makers: [
+    new FedoraRpmMaker({
+      options: {
+        icon: path.resolve(__dirname, 'src/assets/whatsapp-icon.png'),
+      },
+    }),
+  ],
   plugins: [
     new WebpackPlugin({
       mainConfig: './webpack.main.config.ts',

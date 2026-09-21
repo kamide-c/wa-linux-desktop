@@ -32,7 +32,7 @@ function safelyAllowPermission(requestingUrl: unknown, permission: unknown): boo
 }
 
 export function configureWhatsAppWindow(window: BrowserWindow): void {
-  window.webContents.session.setUserAgent(getWhatsAppUserAgent(process.versions.chrome));
+  window.webContents.setUserAgent(getWhatsAppUserAgent(process.versions.chrome));
   window.loadURL(WHATSAPP_WEB_ORIGIN);
 
   window.webContents.on('will-navigate', (event, url) => {

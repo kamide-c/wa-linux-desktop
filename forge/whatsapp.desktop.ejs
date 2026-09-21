@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=<%= productName %>
+Comment=<%= description %>
+GenericName=<%= genericName %>
+Exec=<%= bin %><% if (execArguments) { %> <%= execArguments.join(' ') %><% } %> %U
+Icon=<%= name %>
+Type=Application
+StartupNotify=true
+StartupWMClass=<%= bin %>
+Categories=<%= categories.join(';') %>;

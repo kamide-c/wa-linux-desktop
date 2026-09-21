@@ -15,6 +15,7 @@ const config = {
     new FedoraRpmMaker({
       options: {
         icon: path.resolve(__dirname, 'src/assets/whatsapp-icon.png'),
+        desktopTemplate: path.resolve(__dirname, 'forge/whatsapp.desktop.ejs'),
       },
     }),
   ],

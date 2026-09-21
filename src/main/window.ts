@@ -7,6 +7,10 @@ import {
 } from './navigation-policy';
 import { isAllowedWhatsAppPermission } from './permission-policy';
 
+export function getWhatsAppUserAgent(chromeVersion: string): string {
+  return `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVersion} Safari/537.36`;
+}
+
 function safelyApplyUrlPolicy(policy: (url: string) => boolean, rawUrl: unknown): boolean {
   if (typeof rawUrl !== 'string') return false;
 
@@ -28,6 +32,7 @@ function safelyAllowPermission(requestingUrl: unknown, permission: unknown): boo
 }
 
 export function configureWhatsAppWindow(window: BrowserWindow): void {
+  window.webContents.session.setUserAgent(getWhatsAppUserAgent(process.versions.chrome));
   window.loadURL(WHATSAPP_WEB_ORIGIN);
 
   window.webContents.on('will-navigate', (event, url) => {

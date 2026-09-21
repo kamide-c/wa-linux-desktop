@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": false,
   "main": ".webpack/main",
-  "productName": "WA Desktop Linux",
+  "productName": "WhatsApp",
   "description": "A local Electron desktop shell for WhatsApp Web on Fedora Linux.",
   "license": "MIT",
   "homepage": "https://github.com/kamide-c/wa-desktop-linux",

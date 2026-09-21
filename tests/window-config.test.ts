@@ -1,7 +1,7 @@
 import type { BrowserWindow } from 'electron';
 import { describe, expect, it, vi } from 'vitest';
 import { createWindowOptions } from '../src/main/window-config';
-import { configureWhatsAppWindow } from '../src/main/window';
+import { configureWhatsAppWindow, getWhatsAppUserAgent } from '../src/main/window';
 
 const { openExternal } = vi.hoisted(() => ({
   openExternal: vi.fn(),
@@ -30,6 +30,7 @@ function createWindowDouble() {
   let permissionRequestHandler: PermissionRequestHandler | undefined;
   let permissionCheckHandler: PermissionCheckHandler | undefined;
   const setDisplayMediaRequestHandler = vi.fn();
+  const setUserAgent = vi.fn();
 
   const window = {
     loadURL: vi.fn(),
@@ -47,6 +48,7 @@ function createWindowDouble() {
         setPermissionCheckHandler: vi.fn((handler: PermissionCheckHandler) => {
           permissionCheckHandler = handler;
         }),
+        setUserAgent,
         setDisplayMediaRequestHandler,
       },
     },
@@ -61,10 +63,17 @@ function createWindowDouble() {
       permissionCheck: () => permissionCheckHandler,
     },
     setDisplayMediaRequestHandler,
+    setUserAgent,
   };
 }
 
 describe('WhatsApp window configuration', () => {
+  it('uses a Chrome-compatible Linux user-agent while keeping Electron’s Chromium version', () => {
+    expect(getWhatsAppUserAgent('134.0.0.0')).toBe(
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+    );
+  });
+
   it('creates a sandboxed isolated window without Node.js integration', () => {
     const options = createWindowOptions();
 
@@ -88,9 +97,10 @@ describe('WhatsApp window configuration', () => {
   });
 
   it('wires hardened navigation, external links, and permission policies', () => {
-    const { handlers, setDisplayMediaRequestHandler, window } = createWindowDouble();
+    const { handlers, setDisplayMediaRequestHandler, setUserAgent, window } = createWindowDouble();
     configureWhatsAppWindow(window);
 
+    expect(setUserAgent).toHaveBeenCalledWith(expect.stringContaining('Chrome/'));
     expect(window.loadURL).toHaveBeenCalledWith('https://web.whatsapp.com');
 
     const event = { preventDefault: vi.fn() };

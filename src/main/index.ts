@@ -3,6 +3,7 @@ import { resolveCloseAction, shouldStartHidden } from './lifecycle';
 import { buildTrayMenu } from './tray';
 import { createWindowOptions } from './window-config';
 import { configureWhatsAppWindow } from './window';
+import trayIconSvg from '../assets/tray-icon.svg';
 
 let mainWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -50,7 +51,7 @@ function createMainWindow(): void {
 }
 
 function createTray(): void {
-  tray = new Tray(nativeImage.createEmpty());
+  tray = new Tray(nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(trayIconSvg).toString('base64')}`));
   tray.setContextMenu(
     buildTrayMenu(
       showWindow,

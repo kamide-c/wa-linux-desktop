@@ -8,6 +8,7 @@ const config = {
         test: /\.tsx?$/,
         use: 'ts-loader',
       },
+      { test: /\.svg$/, type: 'asset/source' },
     ],
   },
   resolve: {

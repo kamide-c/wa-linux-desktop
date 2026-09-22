@@ -4,6 +4,7 @@ import { buildTrayMenu } from './tray';
 import { createWindowOptions } from './window-config';
 import { configureWhatsAppWindow } from './window';
 import whatsappIconPng from '../assets/whatsapp-icon.png';
+import trayIconPng from '../assets/tray-icon.png';
 
 let mainWindow: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -52,7 +53,7 @@ function createMainWindow(): void {
 }
 
 function createTray(): void {
-  tray = new Tray(nativeImage.createFromDataURL(whatsappIconPng));
+  tray = new Tray(nativeImage.createFromDataURL(trayIconPng));
   tray.setContextMenu(
     buildTrayMenu(
       showWindow,

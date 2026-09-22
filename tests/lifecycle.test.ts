@@ -80,6 +80,7 @@ describe('tray icon', () => {
     expect(createFromDataURL).toHaveBeenCalledWith(
       expect.stringMatching(/^(data:image\/png;base64,|\/src\/assets\/whatsapp-icon\.png$)/),
     );
+    expect(createFromDataURL).toHaveBeenCalledTimes(2);
     expect(trayInstances).toHaveLength(1);
   });
 });

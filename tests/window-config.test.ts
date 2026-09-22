@@ -1,0 +1,136 @@
+import type { BrowserWindow } from 'electron';
+import { describe, expect, it, vi } from 'vitest';
+import { createWindowOptions } from '../src/main/window-config';
+import { configureWhatsAppWindow, getWhatsAppUserAgent } from '../src/main/window';
+
+const { openExternal } = vi.hoisted(() => ({
+  openExternal: vi.fn(),
+}));
+
+vi.mock('electron', () => ({
+  shell: { openExternal },
+}));
+
+type NavigationHandler = (event: { preventDefault: () => void }, url: string) => void;
+type WindowOpenHandler = (details: { url: string }) => { action: 'deny' };
+type PermissionRequestHandler = (
+  webContents: { getURL: () => string },
+  permission: string,
+  callback: (granted: boolean) => void,
+) => void;
+type PermissionCheckHandler = (
+  webContents: unknown,
+  permission: string,
+  requestingOrigin: string,
+) => boolean;
+
+function createWindowDouble() {
+  const navigationHandlers = new Map<string, NavigationHandler>();
+  let windowOpenHandler: WindowOpenHandler | undefined;
+  let permissionRequestHandler: PermissionRequestHandler | undefined;
+  let permissionCheckHandler: PermissionCheckHandler | undefined;
+  const setDisplayMediaRequestHandler = vi.fn();
+  const setUserAgent = vi.fn();
+
+  const window = {
+    loadURL: vi.fn(),
+    webContents: {
+      on: vi.fn((event: string, handler: NavigationHandler) => {
+        navigationHandlers.set(event, handler);
+      }),
+      setWindowOpenHandler: vi.fn((handler: WindowOpenHandler) => {
+        windowOpenHandler = handler;
+      }),
+      setUserAgent,
+      session: {
+        setPermissionRequestHandler: vi.fn((handler: PermissionRequestHandler) => {
+          permissionRequestHandler = handler;
+        }),
+        setPermissionCheckHandler: vi.fn((handler: PermissionCheckHandler) => {
+          permissionCheckHandler = handler;
+        }),
+        setDisplayMediaRequestHandler,
+      },
+    },
+  } as unknown as BrowserWindow;
+
+  return {
+    window,
+    handlers: {
+      navigation: (event: string) => navigationHandlers.get(event),
+      windowOpen: () => windowOpenHandler,
+      permissionRequest: () => permissionRequestHandler,
+      permissionCheck: () => permissionCheckHandler,
+    },
+    setDisplayMediaRequestHandler,
+    setUserAgent,
+  };
+}
+
+describe('WhatsApp window configuration', () => {
+  it('uses a Chrome-compatible Linux user-agent while keeping Electron’s Chromium version', () => {
+    expect(getWhatsAppUserAgent('134.0.0.0')).toBe(
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+    );
+  });
+
+  it('creates a sandboxed isolated window without Node.js integration', () => {
+    const options = createWindowOptions();
+
+    expect(options.show).toBe(false);
+    expect(options.webPreferences).toMatchObject({
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+    });
+  });
+
+  it('uses the dedicated WhatsApp Web browser session', () => {
+    expect(createWindowOptions()).toMatchObject({
+      width: 1280,
+      height: 800,
+      backgroundColor: '#111b21',
+      webPreferences: {
+        partition: 'persist:whatsapp-web',
+      },
+    });
+  });
+
+  it('wires hardened navigation, external links, and permission policies', () => {
+    const { handlers, setDisplayMediaRequestHandler, setUserAgent, window } = createWindowDouble();
+    configureWhatsAppWindow(window);
+
+    expect(setUserAgent).toHaveBeenCalledWith(expect.stringContaining('Chrome/'));
+    expect(window.loadURL).toHaveBeenCalledWith('https://web.whatsapp.com');
+
+    const event = { preventDefault: vi.fn() };
+    handlers.navigation('will-navigate')?.(event, 'notaurl');
+    expect(event.preventDefault).toHaveBeenCalledOnce();
+
+    const redirectEvent = { preventDefault: vi.fn() };
+    handlers.navigation('will-redirect')?.(redirectEvent, 'https://evil.test/redirect');
+    expect(redirectEvent.preventDefault).toHaveBeenCalledOnce();
+
+    expect(handlers.windowOpen()?.({ url: 'notaurl' })).toEqual({ action: 'deny' });
+    expect(openExternal).not.toHaveBeenCalled();
+    expect(handlers.windowOpen()?.({ url: 'https://example.org/help' })).toEqual({ action: 'deny' });
+    expect(openExternal).toHaveBeenCalledWith('https://example.org/help');
+
+    const requestPermission = vi.fn();
+    handlers.permissionRequest()?.(
+      { getURL: () => 'https://web.whatsapp.com' },
+      'media',
+      requestPermission,
+    );
+    expect(requestPermission).toHaveBeenCalledWith(true);
+    const requestPermissionForTrailingSlashUrl = vi.fn();
+    handlers.permissionRequest()?.(
+      { getURL: () => 'https://web.whatsapp.com/' },
+      'media',
+      requestPermissionForTrailingSlashUrl,
+    );
+    expect(requestPermissionForTrailingSlashUrl).toHaveBeenCalledWith(true);
+    expect(handlers.permissionCheck()?.(null, 'geolocation', 'https://web.whatsapp.com')).toBe(false);
+    expect(setDisplayMediaRequestHandler).not.toHaveBeenCalled();
+  });
+});

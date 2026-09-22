@@ -1,0 +1,70 @@
+{
+  "name": "wa-desktop-linux",
+  "version": "0.1.6",
+  "private": false,
+  "main": ".webpack/main",
+  "productName": "WhatsApp",
+  "description": "A local Electron desktop shell for WhatsApp Web on Fedora Linux.",
+  "license": "MIT",
+  "homepage": "https://github.com/kamide-c/wa-desktop-linux",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "7.11.2",
+    "@electron-forge/maker-rpm": "7.11.2",
+    "@electron-forge/plugin-fuses": "7.11.2",
+    "@electron-forge/plugin-webpack": "7.11.2",
+    "@electron/fuses": "1.8.0",
+    "@types/node": "24.10.1",
+    "@typescript-eslint/eslint-plugin": "8.70.0",
+    "@typescript-eslint/parser": "8.70.0",
+    "electron": "44.4.3",
+    "eslint": "8.57.1",
+    "ts-loader": "9.5.2",
+    "typescript": "5.9.3",
+    "vite": "8.3.0",
+    "vitest": "5.0.1",
+    "webpack": "5.99.9"
+  },
+  "overrides": {
+    "tar": "7.5.22"
+  },
+  "eslintConfig": {
+    "env": {
+      "es2022": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "ignorePatterns": [
+      "out/",
+      ".webpack/",
+      ".vite/",
+      "coverage/"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "*.ts"
+        ],
+        "parserOptions": {
+          "ecmaVersion": 2022,
+          "sourceType": "module"
+        }
+      }
+    ]
+  }
+}

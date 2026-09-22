@@ -1,0 +1,9 @@
+.worktrees/
+node_modules/
+out/
+.webpack/
+.vite/
+coverage/
+.eslintcache
+*.log
+whatsapp-web-profile/
